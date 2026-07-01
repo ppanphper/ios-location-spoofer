@@ -234,9 +234,11 @@ var GCJ = (function(){
     dLng=(dLng*180.0)/(a/sm*Math.cos(radLat)*PI);
     return [lat+dLat,lng+dLng];
   }
-  function gcj2wgs(lat,lng){ // 粗反解，精度约 1~2 米，足够定位用
+  function gcj2wgs(lat,lng){ // 迭代反解，往返误差 <0.001 米
     if(outOfChina(lat,lng))return [lat,lng];
-    var g=wgs2gcj(lat,lng); return [lat*2-g[0], lng*2-g[1]];
+    var wlat=lat, wlng=lng;
+    for(var i=0;i<3;i++){ var g=wgs2gcj(wlat,wlng); wlat+=lat-g[0]; wlng+=lng-g[1]; }
+    return [wlat,wlng];
   }
   return {wgs2gcj:wgs2gcj, gcj2wgs:gcj2wgs};
 })();
